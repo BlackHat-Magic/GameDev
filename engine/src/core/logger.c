@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+#define LOG_MESSAGE_MAX_LENGTH 4096
+
 b8 initialize_logging () {
     // TODO: create log file
     return (TRUE);
@@ -14,7 +16,7 @@ void shutdown_logging () {
     // TODO: cleanup logging; write queued entries
 }
 
-_API void log_output (log_level level, const char* message, ...) {
+void log_output (log_level level, const char* message, ...) {
     const char* log_strings[6] = {
         "[FATAL]:\t",
         "[ERROR]:\t",
@@ -26,9 +28,9 @@ _API void log_output (log_level level, const char* message, ...) {
 
     b8 is_error = level < 2;
 
-    // avoid dynamic memory allocation
-    char out_message[65536];
-    memset (out_message, 0, sizeof (out_message));
+    if (level < LOG_LEVEL_FATAL || level > LOG_LEVEL_TRACE) {
+        fprintf (stderr, "[UNKNOWN]:\t")
+    }
 
     // format original message
     __builtin_va_list arg_ptr;
@@ -37,14 +39,14 @@ _API void log_output (log_level level, const char* message, ...) {
     va_end (arg_ptr);
 
     // prepend log level
-    char out_message2[65536];
-    sprintf (out_message2, "%s%s\n", log_strings[level], out_message);
+    char formatted_message[65536];
+    snprintf (formatted_message, sizeof (formatted_message), "%s%s\n", log_strings[level], out_message);
 
     // is it an error?
     // TODO: Platform-specific output
     if (is_error) {
-        fprintf (stderr, "%s", out_message2);
+        fprintf (stderr, "%s", formatted_message);
     } else {
-        printf ("%s", out_message2);
+        printf ("%s", formatted_message);
     }
 }

@@ -2,13 +2,15 @@ include(GenerateExportHeader)
 
 # library definition
 add_library(engine SHARED
-    src/test.c
+    src/core/logger.c
+    src/core/asserts.c
 )
 
 # add header files; helps IDEs find them
 target_sources(engine PRIVATE
     src/defines.h
-    src/test.h
+    src/core/logger.h
+    src/core/asserts.h
 )
 
 # generate export header
@@ -32,7 +34,13 @@ target_compile_definitions(engine
         # defines only nwhen building engine dll/so itself
         $<$<CXX_COMPILER_ID:MSVC>:CRT_SECURE_NO_WARNINGS>
     PUBLIC
-        # defines needed by code using the engine
+        # DEBUG=1 for Debug builds
+        $<$<CONFIG:Debug>:DEBUG=1>
+        $<$<CONFIG:Release>:RELEASE=1>
+        # also treat as Release for logging with asserts
+        $<$<CONFIG:RelWithDebInfo>:RELEASE=1>
+        # also treat as Release for logging with asserts
+        $<$<CONFIG:MinSizeRel>:RELEASE=1>
 )
 
 target_compile_options(engine PRIVATE

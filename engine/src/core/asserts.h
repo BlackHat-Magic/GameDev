@@ -14,31 +14,25 @@
     #endif
 
     // define assertions
-    _API void report_assertion_failure (const char* expression, const char* message, const char* file, i32 line);
+    ENGINE_EXPORT void report_assertion_failure (const char* expression, const char* message, const char* file, i32 line);
 
     #define _ASSERT (expr) {                                            \
-        if (expr) {                                                     \
-            // ...
-        } else {                                                        \
+        if (!expr) {                                                        \
             report_assertion_failure (#expr, "", __FILE__, __LINE__);   \
             debugBreak ();                                              \
         }                                                               \
     }
 
     #define _ASSERT_MSG (expr, message) {                                   \
-        if (expr) {                                                         \
-            // ...
-        } else {                                                            \
+        if (!expr) {                                                            \
             report_assertion_failure (#expr, message, __FILE__, __LINE__);  \
             debugBreak ()                                                   \
         }                                                                   \
     }
 
-    #ifdef _DEBUG
+    #ifdef DEBUG
         #define _ASSERT_DEBUG (expr) {                                      \
-            if (expr) {                                                     \
-                // ...
-            } else {                                                        \
+            if (!expr) {                                                        \
                 report_assertion_failure (#expr, "", __FILE__, __LINE__);   \
                 debugBreak ();                                              \
             }                                                               \
