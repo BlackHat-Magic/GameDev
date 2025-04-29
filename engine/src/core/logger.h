@@ -6,19 +6,11 @@
 
 #define LOG_WARN_ENABLED 1
 #define LOG_INFO_ENABLED 1
-#define LOG_DEBUG_ENABLED 1
-#define LOG_TRACE_ENABLED 1
 
-#ifdef DEBUG
+#if defined(DEBUG) && RELEASE != 1
     #define LOG_DEBUG_ENABLED 1
     #define LOG_TRACE_ENABLED 1
 #else
-    #define LOG_DEBUG_ENABLED 0
-    #define LOG_TRACE_ENABLED 0
-#endif
-
-// disable debug and trace for release
-#if RELEASE == 1
     #define LOG_DEBUG_ENABLED 0
     #define LOG_TRACE_ENABLED 0
 #endif
@@ -48,26 +40,26 @@ ENGINE_EXPORT void log_output (log_level level, const char* message, ...);
 #if LOG_WARN_ENABLED == 1
     #define _WARN(message, ...) log_output(LOG_LEVEL_WARN, message, ##__VA_ARGS__)
 #else
-    #define _WARN(message, ...)
+    #define _WARN(message, ...) ((void)0)
 #endif
 
 // logs info-level message
 #if LOG_INFO_ENABLED == 1
     #define _INFO(message, ...) log_output(LOG_LEVEL_INFO, message, ##__VA_ARGS__)
 #else
-    #define _INFO(message, ...)
+    #define _INFO(message, ...) ((void)0)
 #endif
 
 // logs debug-level message
 #if LOG_DEBUG_ENABLED == 1
     #define _DEBUG(message, ...) log_output(LOG_LEVEL_DEBUG, message, ##__VA_ARGS__)
 #else
-    #define _DEBUG(message, ...)
+    #define _DEBUG(message, ...) ((void)0)
 #endif
 
 // logs trace-level message
 #if LOG_TRACE_ENABLED == 1
     #define _TRACE(message, ...) log_output(LOG_LEVEL_TRACE, message, ##__VA_ARGS__)
 #else
-    #define _TRACE(message, ...)
+    #define _TRACE(message, ...) ((void)0)
 #endif

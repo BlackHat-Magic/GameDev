@@ -17,36 +17,35 @@ void shutdown_logging () {
 }
 
 void log_output (log_level level, const char* message, ...) {
-    const char* log_strings[6] = {
-        "[FATAL]:\t",
-        "[ERROR]:\t",
-        "[WARN]:\t",
-        "[INFO]:\t",
-        "[DEBUG]:\t",
-        "[TRACE]:\t"
+    const char* log_strings[7] = {
+        "[FATAL]:   ",
+        "[ERROR]:   ",
+        "[WARN]:    ",
+        "[INFO]:    ",
+        "[DEBUG]:   ",
+        "[TRACE]:   ",
+        "[UNKNOWN]: "
     };
 
-    b8 is_error = level < 2;
-
     if (level < LOG_LEVEL_FATAL || level > LOG_LEVEL_TRACE) {
-        fprintf (stderr, "[UNKNOWN]:\t")
+        fprintf (stderr, "[UNKNOWN]: Invalid log level %d for message: %s\n", level, message);
+        return;
     }
 
-    // format original message
-    __builtin_va_list arg_ptr;
+    b8 is_error = level <= LOG_LEVEL_ERROR;
+
+    // avoid dynamic memory allocation
+    char va_formatted_message[LOG_MESSAGE_MAX_LENGTH];
+    memset (va_formatted_message, 0, sizeof (va_formatted_message));
+
+    va_list arg_ptr;
     va_start (arg_ptr, message);
-    vsnprintf (out_message, 65536, message, arg_ptr);
+    vsnprintf (va_formatted_message, LOG_MESSAGE_MAX_LENGTH, message, arg_ptr);
     va_end (arg_ptr);
 
-    // prepend log level
-    char formatted_message[65536];
-    snprintf (formatted_message, sizeof (formatted_message), "%s%s\n", log_strings[level], out_message);
-
-    // is it an error?
-    // TODO: Platform-specific output
+    FILE* output_stream = is_error ? stderr : stdout;
+    fprintf (output_stream, "%s%s\n", log_strings[level], va_formatted_message);
     if (is_error) {
-        fprintf (stderr, "%s", formatted_message);
-    } else {
-        printf ("%s", formatted_message);
+        fflush (output_stream);
     }
 }
